@@ -13,6 +13,7 @@ Currently supports:
 - Control up to four devices such as heaters, pumps, fans, etc.
 - Automated device control based on time, humidity and temperature.
 - Loading as a daemon and logging.
+- Daemon status check via webpage.
 
 To install first clone the repo into the root of the pi users home directory and cd into it:
 
@@ -47,21 +48,29 @@ This script can add and remove users as well as change passwords. To see the com
 
 ```python3 manage_users.py --help```
 
-If you do not wish to use HTTPS you need to comment out the following lines in ```vivarium_ctrl_web.py```:
+If you wish to use HTTPS you need to uncomment the following lines in ```vivarium_ctrl_web.py```:
 
 ```
 # Use HTTPS
-HTTPServer.ssl_adapter = BuiltinSSLAdapter(
-    certificate=dirname + '/cert/cert.pem',
-    private_key=dirname + '/cert/key.pem'
-)
+#HTTPServer.ssl_adapter = BuiltinSSLAdapter(
+#    certificate=dirname + '/cert/cert.pem',
+#    private_key=dirname + '/cert/key.pem'
+#)
 ```
 
-Otherwise generate or obtain an SSL Certificate and place them in a folder named 'cert'.
+And change the commented out line here:
+
+```
+if __name__ == "__main__":
+    app.run()
+    #web.httpserver.runsimple(app.wsgifunc(), ("0.0.0.0", 8181))
+```
+
+Then generate or obtain an SSL Certificate and place them in a folder named 'cert'.
 
 Assuming you have all the hardware setup correctly and the dependencies are installed you should be able to reboot your 
-Raspberry Pi and find the web interface running at raspberrypi:8181 using either HTTP or HTTPS. You can change the 
-settings by clicking the the button at the bottom of the homepage.
+Raspberry Pi and find the web interface running at raspberrypi:8080 for HTTP or raspberrypi:8181 for HTTPS. You can change 
+the settings by clicking the the button at the bottom of the homepage.
 
 ## Hardware
 
@@ -79,12 +88,13 @@ gang can be seen in ```constants.py```.
 
 ## Dependencies
 
-You will need to install Adafruit's CircuitPython BME280, webpy and gpiozero:
+You will need to install Adafruit's CircuitPython BME280, webpy, gpiozero and psutil:
 
 ```
 sudo pip3 install adafruit-circuitpython-bme280
 sudo pip3 install webpy
 sudo pip3 install gpiozero
+sudo pip3 install psutil
 ```
 
 ## Credits
