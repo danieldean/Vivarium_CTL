@@ -166,6 +166,9 @@ def sensor_monitor_loop():
     # Continue running until interrupted.
     while not running.is_set():
 
+        # Take time now to calculate delta for wait.
+        now = time.time()
+
         # Get readings.
         temperature, humidity = round(bme280.temperature, 2), round(bme280.relative_humidity, 2)
 
@@ -219,8 +222,8 @@ def sensor_monitor_loop():
                   (datetime.datetime.fromtimestamp(time.time() - 86400 * settings['days-to-keep']),))
         db.commit()
 
-        # Sleep until next read.
-        running.wait(settings['update-frequency'])
+        # Sleep until next read (taking account of processing time).
+        running.wait(settings['update-frequency'] - (time.time() - now))
 
     # Close db.
     db.close()
